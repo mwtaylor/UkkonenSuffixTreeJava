@@ -16,12 +16,13 @@ public class UkkonenSuffixTree implements SuffixTree {
     UkkonenSuffixTree(String s) {
         this.s = s;
         root = new Node(new HashMap<>(), new HashMap<>());
-
+        int position = 0;
         for (char c : s.toCharArray()) {
-            var edge = new Edge(0, OptionalInt.empty());
+            var edge = new Edge(position, OptionalInt.empty());
             root.edges.put(c, edge);
             var node = new Node(new HashMap<>(), new HashMap<>());
             root.nodes.put(edge, node);
+            position++;
         }
     }
 
@@ -30,6 +31,8 @@ public class UkkonenSuffixTree implements SuffixTree {
     }
 
     private boolean contains(String subString, Node node) {
+        if (subString.isEmpty()) return true;
+
         var c = subString.charAt(0);
         if (!node.edges.containsKey(c)) return false;
         var edge = node.edges.get(c);
@@ -38,10 +41,10 @@ public class UkkonenSuffixTree implements SuffixTree {
             case Edge(var start, var end) when end.isEmpty() -> s.substring(start);
             case Edge(var start, var end) -> s.substring(start, end.getAsInt());
         };
+        if (subString.length() < prefix.length()) return prefix.startsWith(subString);
         if (!subString.startsWith(prefix)) return false;
 
         var remaining = subString.substring(prefix.length());
-        if (remaining.isEmpty()) return true;
 
         var nextNode = node.nodes.get(edge);
         return contains(remaining, nextNode);
